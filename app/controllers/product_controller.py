@@ -88,3 +88,8 @@ def delete_product(product_id):
     product_service.delete_product(product)
 
     return "", 204
+
+
+def product_summary():
+    summary = product_service.get_product_summary()
+    return jsonify(summary), 200

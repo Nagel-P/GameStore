@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import func, select
 from app.extensions import db
 from app.models.product import Product
 from app.models.category import Category
@@ -82,3 +82,23 @@ def patch_product(product, data):
 def delete_product(product):
     db.session.delete(product)
     db.session.commit()
+
+
+def get_product_summary():
+    total_products = db.session.scalar(
+        select(func.count(Product.id))
+    ) or 0
+
+    total_stock = db.session.scalar(
+        select(func.coalesce(func.sum(Product.stock), 0))
+    ) or 0
+
+    average_price = db.session.scalar(
+        select(func.avg(Product.price))
+    )
+
+    return {
+        "total_products": total_products,
+        "total_stock": total_stock,
+        "average_price": round(float(average_price), 2) if average_price is not None else 0.0
+    }
